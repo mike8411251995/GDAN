@@ -4,9 +4,9 @@ data_root: './data/xlsa17/data'
 
 # i/o setting
 result: './result/sun'
-ckpt_dir: './checkpoints/gdan_sun'
-vae_dir: './checkpoints/cvae_sun/'
-vae_ckpt: './checkpoints/cvae_sun/cvae_320.pkl'
+ckpt_dir: './data/checkpoints/gdan_sun'
+vae_dir: './data/checkpoints/cvae_sun/'
+vae_ckpt: './data/checkpoints/cvae_sun/cvae_320.pkl'
 best_checkpoint: 'gdan_50.pkl'
 
 # flags and environment

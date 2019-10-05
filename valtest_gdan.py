@@ -21,6 +21,7 @@ from utils.data_factory import DataManager
 from utils.utils import load_data, update_values, get_datetime_str
 from utils.logger import Logger, log_args
 
+from ipdb import set_trace
 
 parser = argparse.ArgumentParser(description='argument parser')
 
@@ -31,7 +32,7 @@ parser.add_argument('-cfg', '--config', metavar='YAML', default=None,
 parser.add_argument('-dn', '--data_name', metavar='NAME', default='CUB',
                     choices=['CUB', 'SUN', 'APY', 'AWA1', 'AWA2', 'ImageNet'],
                     help='name of dataset')
-parser.add_argument('-d', '--data_root', metavar='DIR', default='./ZSL-GBU/xlsa17/data',
+parser.add_argument('-d', '--data_root', metavar='DIR', default='./data/xlsa17/data',
                     help='path to data directory')
 parser.add_argument('-r', '--result', metavar='DIR', default='./result',
                     help='path to result directory')
@@ -86,7 +87,7 @@ if not result_dir.is_dir():
 val_acc_file = str(result_dir / Path('val_acc_' + args.data_name + '_' + ts + '.txt'))
 logfile = result_dir / Path(args.logfile)
 logMaster = Logger(str(logfile))
-log_args(str(logfile), args)
+# log_args(str(logfile), args)
 
 
 def main():
@@ -111,25 +112,32 @@ def main():
     else:
         std = False
 
-    filenames = sorted(filenames, key=cmp_func)
-    for checkpoint in filenames:
+    # filenames = sorted(filenames, key=cmp_func)
+    # for checkpoint in filenames:
 
-        macc = eval_model_val(checkpoint, logger, att_feats, train_data, val_data, classes)
+    #     macc = eval_model_val(checkpoint, logger, att_feats, train_data, val_data, classes)
 
-        val_acc.append(macc)
+    #     val_acc.append(macc)
 
-        H = macc
+    #     H = macc
 
-        if H > best_H:
-            best_H = H
-            best_model = checkpoint
+    #     if H > best_H:
+    #         best_H = H
+    #         best_model = checkpoint
 
-        logger.info(f'best: {best_model}, macc_u : {best_H:4.5}\n')
+    #     # logger.info(f'best: {best_model}, macc_u : {best_H:4.5}\n')
+    #     print('best model')
+    #     print('gzsl unseen: %d'%(best_H))
+    best_model = './data/checkpoints/gdan_cub/gdan_200.pkl'
+    # best_model = './data/checkpoints/gdan_awa2/gdan_300.pkl'
+    # best_model = './data/checkpoints/gdan_sun/gdan_50.pkl'
+    # best_model = './data/checkpoints/gdan_apy/gdan_230.pkl'
 
     macc_u, macc_s, H = eval_model_test(best_model, logger, att_feats, train_data, test_data, test_s_data, classes)
-    logger.info(f'\ntest: {best_model}, gzsl unseen: {macc_u:4.5}, '
-                f'gzsl seen: {macc_s:4.5}, gzsl H: {H:4.5}\n')
+    # logger.info(f'\ntest: {best_model}, gzsl unseen: {macc_u:4.5}, '
+    #             f'gzsl seen: {macc_s:4.5}, gzsl H: {H:4.5}\n')
 
+    
     with open(val_acc_file, 'w') as fout:
         for acc in val_acc:
             fout.write(str(acc) + '\n')
@@ -140,7 +148,8 @@ def main():
 def eval_model_val(checkpoint, logger, att_feats, train_data, val_data, classes):
     logger.info('building model...')
 
-    states = torch.load(checkpoint)
+    states = torch.load(str(checkpoint))
+    print(str(checkpoint))
 
     net = CVAE(x_dim=states['x_dim'], s_dim=states['s_dim'], z_dim=states['z_dim'], enc_layers=states['enc_layers'],
                dec_layers=states['dec_layers'])
@@ -151,7 +160,7 @@ def eval_model_val(checkpoint, logger, att_feats, train_data, val_data, classes)
     dis.cuda()
     reg.cuda()
 
-    logger.info(f'loading model from checkpoint: {checkpoint}')
+    # logger.info(f'loading model from checkpoint: {checkpoint}')
 
     net.load_state_dict(states['gen'])
     dis.load_state_dict(states['dis'])
@@ -182,14 +191,15 @@ def eval_model_val(checkpoint, logger, att_feats, train_data, val_data, classes)
     pred_Y = clf.predict(test_X)
     macc_u = cal_macc(truth=test_Y, pred=pred_Y)
 
-    logger.info(f'gzsl macc_u: {macc_u:4.5}')
+    # logger.info(f'gzsl macc_u: {macc_u:4.5}')
+    print('gzsl unseen: %d'%(macc_u))
     return macc_u
 
 
 def eval_model_test(checkpoint, logger, att_feats, train_data, test_data, test_s_data, classes):
     logger.info('building model...')
 
-    states = torch.load(checkpoint)
+    states = torch.load(str(checkpoint))
 
     net = CVAE(x_dim=states['x_dim'], s_dim=states['s_dim'], z_dim=states['z_dim'], enc_layers=states['enc_layers'],
                dec_layers=states['dec_layers'])
@@ -200,7 +210,7 @@ def eval_model_test(checkpoint, logger, att_feats, train_data, test_data, test_s
     dis.cuda()
     reg.cuda()
 
-    logger.info(f'loading model from checkpoint: {checkpoint}')
+    # logger.info(f'loading model from checkpoint: {checkpoint}')
 
     net.load_state_dict(states['gen'])
     dis.load_state_dict(states['dis'])
@@ -243,7 +253,14 @@ def eval_model_test(checkpoint, logger, att_feats, train_data, test_data, test_s
     else: 
         H = 2 * macc_s * macc_u / (macc_s + macc_u)
 
-    logger.info(f'gzsl unseen: {macc_u:4.5}, gzsl seen: {macc_s:4.5}, gzsl H: {H:4.5}\n')
+    set_trace()
+    print('gzsl unseen: %d'%(macc_u))
+    print('gzsl seen: %f'%(macc_s))
+    print('gzsl H: %e'%(H))
+
+    # logger.info(f'gzsl unseen: {macc_u:4.5}, gzsl seen: {macc_s:4.5}, gzsl H: {H:4.5}\n')
+    
+
     return macc_u, macc_s, H
 
 

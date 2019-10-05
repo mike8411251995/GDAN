@@ -1,4 +1,3 @@
-
 import os
 import time
 import yaml
@@ -129,13 +128,13 @@ def main():
                 true_scores = dis.forward(X, S)
                 fake_scores = dis.forward(Xp, S)
                 fake_scores2 = dis.forward(Xpp, S)
-                reg_scores = dis.forward(X, Sp)
+                # reg_scores = dis.forward(X, Sp)
                 ctrl_scores = dis.forward(X, Sc)
 
                 # calculate loss
-                d_loss = mse_loss(true_scores, ones) + mse_loss(fake_scores, zeros) + args.theta3 * mse_loss(reg_scores, zeros) \
-                         + mse_loss(ctrl_scores, zeros) 
-
+                # d_loss = mse_loss(true_scores, ones) + mse_loss(fake_scores, zeros) + args.theta3 * mse_loss(reg_scores, zeros) \
+                #          + mse_loss(ctrl_scores, zeros) 
+                d_loss = mse_loss(true_scores, ones) + mse_loss(fake_scores, zeros) + mse_loss(ctrl_scores, zeros)
                 d_loss.backward()
                 dis_opt.step()
 
@@ -161,40 +160,41 @@ def main():
                 # get scores
                 fake_scores = dis.forward(Xp, S)
                 fake_scores2 = dis.forward(Xp2, S)
-                reg_scores = dis.forward(X, Sp)
+                # reg_scores = dis.forward(X, Sp)
 
                 # calculate loss
                 vae_loss = gen.vae_loss(X=X, Xp=Xp, mu=mu, log_sigma=log_sigma)
-                cyc_loss = mse_loss(Spp, S) + mse_loss(Xpp, X)
+                # cyc_loss = mse_loss(Spp, S) + mse_loss(Xpp, X)
 
                 g_loss = mse_loss(fake_scores, ones) 
                 r_loss = mse_loss(Sp, S)
-                rd_loss = mse_loss(reg_scores, ones)
+                # rd_loss = mse_loss(reg_scores, ones)
 
-                total_loss = vae_loss + g_loss + args.theta1 * cyc_loss + args.theta2 * r_loss + args.theta3 * rd_loss
+                # total_loss = vae_loss + g_loss + args.theta1 * cyc_loss + args.theta2 * r_loss + args.theta3 * rd_loss
+                total_loss = vae_loss + g_loss + args.theta2 * r_loss
                 total_loss.backward()
 
                 gen_opt.step()
                 reg_opt.step()
 
-                vae_total_loss += vae_loss.cpu().data.numpy()
+                vae_total_loss += vae_loss.cpu().data.numpy()                
                 g_total_loss += g_loss.cpu().data.numpy()
-                cyc_total_loss += cyc_loss.cpu().data.numpy()
+                # cyc_total_loss += cyc_loss.cpu().data.numpy()
                 r_total_loss += r_loss.cpu().data.numpy()
-                rd_total_loss += rd_loss.cpu().data.numpy()
+                # rd_total_loss += rd_loss.cpu().data.numpy()
                 g_scores += np.mean(fake_scores.cpu().data.numpy())
 
         g_total_steps = steps * args.g_iter
         d_total_steps = steps * args.d_iter
         vae_avg_loss = vae_total_loss / g_total_steps
         g_avg_loss = g_total_loss / g_total_steps
-        cyc_avg_loss = cyc_total_loss / g_total_steps
+        # cyc_avg_loss = cyc_total_loss / g_total_steps
         r_avg_loss = r_total_loss / g_total_steps
-        rd_avg_loss = rd_total_loss / g_total_steps
+        # rd_avg_loss = rd_total_loss / g_total_steps
         d_avg_loss = d_total_loss / d_total_steps
         g_avg_score = g_scores / g_total_steps
-        loss_history.append(f'{g_avg_loss:.4}\t{d_avg_loss:.4}\t{cyc_avg_loss:.4}\t{r_avg_loss:.4}\t'
-                            f'{rd_avg_loss:.4}\t{g_avg_score:.4}\t{vae_avg_loss:.4}\n')
+        # loss_history.append(f'{g_avg_loss:.4}\t{d_avg_loss:.4}\t{cyc_avg_loss:.4}\t{r_avg_loss:.4}\t'
+        #                     f'{rd_avg_loss:.4}\t{g_avg_score:.4}\t{vae_avg_loss:.4}\n')
         elapsed = (time.time() - t1)/60.0
 
         if (epoch+1) % 10 == 0 or epoch == 0:
@@ -220,9 +220,9 @@ def main():
             states['theta3'] = args.theta3
 
             torch.save(states, str(save_path))
-            logger.info(f'epoch: {epoch+1:4}, g_loss: {g_avg_loss: .4}, d_loss: {d_avg_loss: .4}, \n'
-                        f'cyc_loss: {cyc_avg_loss: .4}, r_loss: {r_avg_loss: .4}, rd_loss: {rd_avg_loss: .4}, '
-                        f'g_score: {g_avg_score:.4}, vae loss: {vae_avg_loss:.4}')
+            # logger.info(f'epoch: {epoch+1:4}, g_loss: {g_avg_loss: .4}, d_loss: {d_avg_loss: .4}, \n'
+            #             f'cyc_loss: {cyc_avg_loss: .4}, r_loss: {r_avg_loss: .4}, rd_loss: {rd_avg_loss: .4}, '
+            #             f'g_score: {g_avg_score:.4}, vae loss: {vae_avg_loss:.4}')
 
     with result_path.open('w') as fout:
         for s in loss_history:

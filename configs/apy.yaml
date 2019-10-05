@@ -4,10 +4,10 @@ data_root: './data/xlsa17/data'
 
 # i/o setting
 result: './result/apy'
-ckpt_dir: './checkpoints/gdan_apy'
-vae_dir: './checkpoints/cvae_apy/'
-vae_ckpt: './checkpoints/cvae_apy/cvae_590.pkl'
-best_checkpoint: 'gdan_220.pkl'
+ckpt_dir: './data/checkpoints/gdan_apy'
+vae_dir: './data/checkpoints/cvae_apy/'
+vae_ckpt: './data/checkpoints/cvae_apy/cvae_590.pkl'
+best_checkpoint: 'gdan_220.pkl'      # gdan_220.pkl
 
 # flags and environment
 gpu: '0'

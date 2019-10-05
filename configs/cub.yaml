@@ -6,7 +6,7 @@ data_root: './data/xlsa17/data'
 result: './result/cub'
 ckpt_dir: './data/checkpoints/gdan_cub'
 vae_dir: './data/checkpoints/cvae_cub'
-vae_ckpt: './data/checkpoints/cvae_cub/cvae_670.pkl'
+vae_ckpt: './data/checkpoints/cvae_cub/cvae_670.pkl'         # cvae_670.pkl
 best_checkpoint: 'gdan_180.pkl'
 
 # flags and environment

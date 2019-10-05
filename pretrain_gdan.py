@@ -20,8 +20,14 @@ from utils.data_factory import DataManager
 from utils.utils import load_data, update_values
 from utils.logger import Logger
 
+from ipdb import set_trace
 
 args = parser.parse_args()
+# class Namespace:
+#     def __init__(self, **kwargs):
+#         self.__dict__.update(kwargs)
+
+# args = Namespace(batch=128, ckpt_dir='./checkpoints', config='configs/cub.yaml', d_iter=1, data_name='CUB', data_root='./ZSL-GBU/xlsa17/data', debug=False, dec='600', dis='1200 600', enc='1200 600', epoch=1000, g_iter=1, gan_model='lsgan', gpu='1', learning_rate=1e-05, reg='512', result='./result', s_dim=312, save_epoch=10, steps=-1, theta1=0.1, theta2=0.1, theta3=0.1, vae_ckpt='./checkpoints/cvae_800.pkl', x_dim=2048, z_dim=100)
 
 # if yaml config exists, load and override default ones
 if args.config is not None:
@@ -77,7 +83,6 @@ def main():
             Xp, mu, log_sigma = cvae.forward(X, S)
 
             loss_vae = cvae.vae_loss(X, Xp, mu, log_sigma)
-            cvae_opt.zero_grad()
             loss_vae.backward()
             cvae_opt.step()
 
@@ -95,7 +100,7 @@ def main():
             states['s_dim'] = args.s_dim
             states['optim'] = cvae.state_dict()
             torch.save(states, str(save_path))
-            logger.info(f'epoch: {epoch+1:4}, loss: {running_loss: .5}')
+            # logger.info('epoch:' %d %(epoch+1), 'loss:' %s %(running_loss)
     logger.info('program finished')
 
 
