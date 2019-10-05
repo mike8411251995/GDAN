@@ -9,7 +9,7 @@ parser.add_argument('-cfg', '--config', metavar='YAML', default=None,
 parser.add_argument('-dn', '--data_name', metavar='NAME', default='CUB',
                     choices=['CUB', 'SUN', 'APY', 'AWA1', 'AWA2', 'ImageNet'],
                     help='name of dataset')
-parser.add_argument('-d', '--data_root', metavar='DIR', default='./ZSL-GBU/xlsa17/data',
+parser.add_argument('-d', '--data_root', metavar='DIR', default='./data/xlsa17/data',
                     help='path to data directory')
 parser.add_argument('-r', '--result', metavar='DIR', default='./result',
                     help='path to result directory')

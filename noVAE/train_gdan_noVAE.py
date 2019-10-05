@@ -15,8 +15,8 @@ import torch.optim as optim
 from torch import autograd
 from torch.autograd import Variable
 
-from models.gdan import Generator, Discriminator, Regressor
-from utils.config_gdan import parser
+from models.gdan_noVAE import Generator, Discriminator, Regressor
+from utils.config_gdan_noVAE import parser
 from utils.data_factory import DataManager
 from utils.utils import load_data, update_values, get_negative_samples
 from utils.logger import Logger, log_args
